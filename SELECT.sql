@@ -109,6 +109,7 @@ SELECT first_name, salary FROM employees WHERE salary >=10000 ORDER BY salary DE
 -- 부서 번호, 급여, 이름순으로 출력하되 부서번호를 오름차순, 급여를 내림차순으로 출력 
 SELECT department_id, salary, first_name FROM employees ORDER BY department_id ASC, salary DESC;
 
+
 -------------------------------------
 --단일행 함수: 레코드를 입력으로 받음 
 
@@ -145,9 +146,8 @@ SELECT ABS (-3.14), --절대 값
     TRUNC (3.4567,2) -- 소숫점 두번째 자리까지 버림 (소숫점 두자리까지 표시)
 FROM dual; 
     
-----------------------------
---DATE FORMAT 
-
+    
+--날짜형 단일행 함수
 --날짜 형식 확인 
 SELECT * FROM nls_session_parameters -- nls: national language setting
 WHERE parameter = 'NLS_DATE_FORMAT';
@@ -165,15 +165,88 @@ SELECT sysdate, -- 현재 날짜와 시간
     TRUNC(TO_DATE('2021-05-17', 'YYYY-MM-DD'), 'MONTH') -- MONTH 정보로 버림 
 FROM  dual;
 
-
 --현재 날짜 기준, 입사한지 몇개월 지났는가?
 SELECT first_name, hire_date, ROUND(MONTHS_BETWEEN (sysdate,hire_date))
 FROM employees;
 
 
+--변환 함수
+--TO_NUMBER (s, frm): 문자열 -> 숫자형
+--TO_DATE (s, frm): 문자열 -> 날짜형
+--TO_CHAR(s, frm): 숫자, 날짜 -> 문자형
+
+--TO_CHAR
+SELECT first_name, hire_date, TO_CHAR (hire_date, 'YYYY-MM-DD HH24:MI:SS')
+FROM employees;
+--현재 날짜의 포맷을 문자형으로 출력 
+SELECT sysdate, TO_CHAR(sysdate, 'YYYY-MM-DD  HH24:MI:SS')
+FROM dual;
+
+--숫자열을 문자열로 
+SELECT TO_CHAR(123456789.0123,'999,999,999.99')
+FROM dual;
+--연봉 정보를 문자열로 
+SELECT first_name, TO_CHAR(salary*12, '$999,999.99') SAL 
+FROM employees;
+
+--TO_NUMBER: 문자열-> 숫자 
+--산술연산이 가능하게 만들어줌 
+SELECT TO_NUMBER('1,999','999,999'),TO_NUMBER('$1,350.99','$999,999.99') 
+FROM dual;
+
+--TO_DATE: 문자열 -> 날짜
+SELECT TO_DATE ('2021-05-05 12:30', 'YYYY-MM-DD HH12:MI')
+FROM dual;
+
+--DATE 연산
+--DATE + (-) Number : 날짜에 일수를 더한다 (or 뺀다) -> Date
+--Date-Date: 날짜에서 날짜를 뺀 일수를 확인할 수 있음 
+--Date + Number /24: 날짜에 시간을 더할 때, 시간을 24로 나눈 값을 더한다 (뺀다). 
+SELECT TO_CHAR(sysdate, 'YY/MM/DD HH24:MI'),
+    sysdate + 1, --1일 후 
+    sysdate - 1, -- 1일 전 
+    sysdate - TO_DATE('2012-09-24', 'YYYY-MM-DD'), -- 두 날짜의 차이 일수
+    TO_CHAR (sysdate + 13/24, 'YY/MM/DD HH24:MI') --13시간 후 
+FROM dual;
 
 
+--기타함수
+--NULL 관련 
+--nvl 함수
+SELECT first_name, salary, salary +(salary*nvl(commission_pct,0)) --commision_pct가 null 이면 0으로 변경
+FROM employees;
+--nvl2함수
+--nvl2(표현식, null이 아닐 경우, null일 경우) \
+SELECT first_name, salary, commission_pct, salary + nvl2(commission_pct, salary*commission_pct, 0)
+FROM employees;
 
+--CASE 함수
+--보너스 지급 : AD관련 20%; SA관련 10%, IT관련 8%; 나머지 5%
+SELECT first_name, job_id, salary, SUBSTR(job_id,1,2),  
+    CASE SUBSTR(job_id,1,2) WHEN 'AD' THEN salary*0.2
+                            WHEN 'SA' THEN salary*0.1
+                            WHEN 'IT' THEN salary*0.08
+                            ELSE salary*0.05
+    END as bonus
+FROM employees;
 
+--DECODE 함수 
+SELECT first_name, job_id, salary, SUBSTR(job_id,1,2),
+    DECODE (SUBSTR(job_id,1,2), 
+        'AD', salary*0.2,
+        'SA', salary*0.1,
+        'IT', salary*0.08,
+        salary*0.05) bonus
+FROM employees;
 
+--연습문제 
+--departmnet_id <=30 -> A group; department_id <=50 -> B group; department_id<=100 -> C group ; 나머지 remainder
+SELECT first_name, department_id, 
+    CASE WHEN department_id <=30 THEN 'A-GROUP'
+        WHEN department_id <=50 THEN 'B-GROUP'
+        WHEN department_id <= 100 THEN 'C-GROUP'
+        ELSE 'REMAINDER' 
+END as team
+FROM employees
+ORDER BY team;
 

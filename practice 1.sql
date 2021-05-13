@@ -43,4 +43,22 @@ WHERE department_id IN(10,90,100);
 --이름 (first_name)에 S 또는 s가 들어가는 직원의 이름, 월급을 출력
 SELECT first_name, salary FROM employees WHERE first_name like '%s%' or first_name like 'S%';
 
+--#8
+--전체 부서를 출력; 순서는 부서이름이 긴 순서대로 (내림)
+SELECT department_name
+FROM departments
+ORDER BY LENGTH(department_name) DESC;
 
+--#9
+--나라이름을 대문자로 출력하고 올림차순으로 정렬 
+SELECT UPPER(country_name)
+FROM countries
+ORDER BY country_name ASC;
+
+--#10
+--입사일이 03/12/31일 이전 입사한 직원의 이름, 월급, 전화번호, 입사일을 출력
+--전화번호는 545-343-3433으로 출력
+SELECT first_name, salary, phone_number "545-343-3433", hire_date
+FROM employees
+WHERE hire_date <= '03/12/31';
+ 
