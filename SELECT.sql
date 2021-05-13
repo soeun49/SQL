@@ -83,6 +83,7 @@ SELECT first_name, hire_date FROM employees WHERE hire_date between '07/01/01' a
 SELECT first_name,department_id FROM employees WHERE department_id=10 or department_id=20 or department_id=40;
 --IN활용
 SELECT first_name, department_id FROM employees WHERE department_id IN(10,20,40);
+
 --Manager id가 100,120,147인 사원의 명단 목록
 --비교, 논리연산자 활요
 SELECT first_name, manager_id FROM employees WHERE manager_id=100 or manager_id=120 or manager_id=147; 
@@ -95,7 +96,7 @@ SELECT first_name, salary FROM employees WHERE first_name LIKE '%am%';
 --이름의 두번째 글자가 a인 사람의 이름과 급여를 출력
 SELECT first_name, salary FROM employees WHERE first_name LIKE '_a%';
 --이름의 네번째 글자가 a인 사람의 이름을 출력
-SELECT first_name FROM employees WHERE first_name LIKE '___a%';
+SELECT first_name, salary FROM employees WHERE first_name LIKE '___a%';
 --이름이 4글자인 사원 중에서 끝에서 두번째 글자가 a인 사원의 이름을 출력 
-SELECT first_name FROM employees WHERE first_name LIKE '__a_';
+SELECT first_name, salary FROM employees WHERE first_name LIKE '__a_';
 
