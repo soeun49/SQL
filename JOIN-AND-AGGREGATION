@@ -1,0 +1,134 @@
+--JOIN
+--1. SIMPLE JOIN
+--1) employees 테이블과 departments 테이블을 확인 
+DESC employees;
+DESC departments;
+--2) 두 테이블로부터 필드의 갯수를 확인 
+SELECT * FROM employees;  -- 107개
+SELECT * FROM departments; --27개
+--3) 두 테이블의 정보를 추출
+SELECT first_name, department_name FROM employees, departments; -- 107*27 =2889개 
+-- 두 테이블의 조합 가능한 모든 쌍이 출력 
+-- 카티션 프로덕트 (CP) or cross join
+-- 일반적으로 원하지 않는 결과...가 출력 
+--DESHALB, 두 테이블의 연결 조건으로 WHERE에 부여 -> SIMPLE JOIN(!)
+SELECT * 
+FROM employees, departments 
+WHERE employees.department_id = departments.department_id;-- 106개 (Missing one) 
+
+--필드의 모호성을 해소하기 위해, 테이블 명 혹은 alias 를 부여
+SELECT first_name,  emp.department_id, dept.department_name
+FROM employees emp, departments dept
+WHERE emp.department_id = dept.department_id;
+
+
+--2.EQUI-JOIN (USING (...)) = NATURAL JOIN
+--WHERE 절에 기술하는 조인 조건이 됨 
+--연습문제 
+--employees와 departments를 department_id로 조인하여 first_name, department_id, departmnent_name출력
+--(+)department_null인 사원 찾기 
+SELECT emp.first_name, dept.department_name
+FROM employees emp JOIN departments dept USING (department_id);
+
+SELECT first_name, department_name
+FROM employees emp JOIN departments dept 
+                    ON emp.department_id=dept.department_id; --ON은 JOIN의 조건 명시할 때 사용 
+
+SELECT first_name, department_name 
+FROM employees NATURAL JOIN departments;-- NATURAL JOIN: 같은 이름을 가진 컬럼을 기준으로 JOIN
+
+
+--3.THETA JOIN = NON-EQUI JOIN
+--특정 조건을 기준으로 JOIN을 하되, 조건이 =이 아닌 경우
+SELECT * FROM jobs WHERE job_id = 'FI_MGR';
+
+SELECT first_name, salary FROM employees emp, jobs j
+WHERE j.job_id='FI_MGR' AND salary BETWEEN j.min_salary and j.max_salary;
+
+
+--4.INNER JOIN 
+SELECT first_name, emp.department_id, dept.department_id, department_name
+FROM employees emp, departments dept
+WHERE emp.department_id=dept.department_id; --106명
+
+--전체 사원수 
+SELECT COUNT(*) FROM employees; --107명의 사원 
+--부서 id가 null인 사원 찾기
+SELECT first_name, department_id
+FROM employees WHERE department_id IS NULL;
+
+
+--5.OUTER JOIN 
+--조건이 만족하는 짝이 없는 레코드도 null을 포함하여 결과를 출력 
+--모든 레코드를 출력할 테이블이 어느 위치에 있는가에 따라서 LEFT,RIGHT, FULL 로 나뉨 
+--ORACLE SQL의 경우, NULL이 출력될 수 있는 쪽 조건에 (+)를 붙인다
+
+--LEFT OUTER JOIN: 짝이 없어도 왼쪽의 테이블 전체를 출력에 참여 
+--ORACLE SQL
+SELECT first_name, emp.department_id, dept.department_id, department_name
+FROM employees emp, departments dept 
+WHERE emp.department_id  = dept.department_id(+);
+--ANSI SQL (LEFT OUTER JOIN ~ON)
+SELECT first_name, emp.department_id, dept.department_id, department_name
+FROM employees emp LEFT OUTER JOIN departments dept 
+                            ON emp.department_id = dept.department_id;
+                            
+--RIGHT OUTER JOIN: 짝이 없어도 오른쪽의 테이블 전체를 출력에 참여 
+--ORACLE SQL 
+SELECT first_name, emp.department_id, dept.department_id, department_name
+FROM employees emp, departments dept
+WHERE emp.department_id(+) = dept.department_id;
+--ANSI SQL (RIGHT OUTER JOIN ~ON)
+SELECT first_name, emp.department_id, dept.department_id, department_name
+FROM employees emp RIGHT OUTER JOIN departments dept
+                         ON emp.department_id=dept.department_id;
+
+--FULL OUTER JOIN: 양 쪽 테이블 모두 짝이 없어도 출력에 참여
+--ORACLE SQL은 LEFT(RIGHT) OUTER JOIN만 가능함 
+--deshalb ERROR:
+--SELECT first_name, emp.department_id, dept.department_id, department_name
+--FROM employees emp, departments dept WHERE emp.department_id(+) =dept.department_id(+);
+
+--ANSI SQL만 적용 가능 
+SELECT first_name, emp.department_id, dept.department_id, department_name
+FROM employees emp FULL OUTER JOIN departments dept
+                    ON emp.department_id= dept.department_id;
+                    
+                    
+--cf. n개의 테이블을 JOIN(!)
+--부서 id, 부서명, 해당 부서가 위치한 city, country_name를 결합한 테이블을 출력해보자!
+SELECT department_id, dept.department_name, loc.city, c.country_name
+FROM departments dept, locations loc JOIN countries c
+                                ON loc.country_id= c.country_id
+WHERE dept.location_id= loc.location_id
+ORDER BY dept.department_id ASC;
+--OR 
+SELECT department_id, department_name, city, country_name
+FROM departments dept, locations loc, countries c 
+WHERE dept.location_id=loc.location_id AND loc.country_id=c.country_id
+ORDER BY dept.department_id ASC;
+
+
+--SELF JOIN
+--자기 자신과 JOIN
+--한개의 테이블을 두 번이상 사용하므로 반드시 alias 사용필수!
+--연습문제 
+--employee_id, first_name, manager의 employee_id, manger의 first_name을 출력
+SELECT * FROM employees; --107명 
+SELECT a.employee_id, a.first_name, a.manager_id, b.first_name
+FROM employees a JOIN employees b
+                    ON a.manager_id=b.employee_id;
+                    
+--OR
+SELECT a.employee_id, a.first_name, a.manager_id, b.first_name
+FROM employees a , employees b
+WHERE a.manager_id=b.employee_id; --106명
+
+--manger 가 없는 사람? 
+SELECT *FROM employees WHERE manager_id IS NULL;
+
+-- manager가 없는 사람도 포함해서 출력 ->OUTER JOIN 이용
+SELECT a.employee_id, a.first_name, a.manager_id, b.first_name
+FROM employees a, employees b
+WHERE a.manager_id=b.employee_id(+); -- employee_id가 있는 쪽에 (+)를 붙이자! 
+

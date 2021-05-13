@@ -50,6 +50,10 @@ FROM departments
 ORDER BY LENGTH(department_name) DESC;
 
 --#9
+--정확하지는 않지만 지사가 있을거라고 예상되는 나라들을 
+--나라이름을 대문자로 출력하고 올림차순으로 정렬 
+
+
 --나라이름을 대문자로 출력하고 올림차순으로 정렬 
 SELECT UPPER(country_name)
 FROM countries
