@@ -1,3 +1,6 @@
+
+--조인
+
 --#1
 --직원들의 employee_id, first_name, last_name, department_name을 조회하여
 --department_name 오름차순, employee_id 내림차순으로 정렬 
@@ -27,7 +30,6 @@ ORDER BY employee_id ASC;
 
 --#2-1
 --부서가 없는 Kimberly 사원까지 표시
-
 --oracle sql
 SELECT employee_id, first_name, salary, department_name, job_title
 FROM  employees emp, departments dept, jobs j                   

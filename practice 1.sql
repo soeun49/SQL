@@ -52,12 +52,20 @@ ORDER BY LENGTH(department_name) DESC;
 --#9
 --정확하지는 않지만 지사가 있을거라고 예상되는 나라들을 
 --나라이름을 대문자로 출력하고 올림차순으로 정렬 
-
+SELECT UPPER(country_name) 
+FROM countries co JOIN locations loc
+                ON co.country_id=loc.country_id
+                JOIN departments dept
+                ON loc.location_id=dept.location_id
+GROUP BY country_name
+ORDER BY country_name ASC;
+                
 
 --나라이름을 대문자로 출력하고 올림차순으로 정렬 
 SELECT UPPER(country_name)
 FROM countries
 ORDER BY country_name ASC;
+
 
 --#10
 --입사일이 03/12/31일 이전 입사한 직원의 이름, 월급, 전화번호, 입사일을 출력
