@@ -317,3 +317,81 @@ SELECT e.department_id, e.employee_id, e.first_name, e.salary FROM employees e,
 (SELECT department_id, Max(salary) salary FROM employees GROUP BY department_id) s
 WHERE e.department_id=s.department_id AND e.salary=s.salary
 ORDER BY department_id;
+
+
+-------
+--TOP-K QUERY
+--ROWNUM: 쿼리 질의 수행결과에 의한 가상의 column -> 쿼리 결과의 순서 반환 
+--e.g. 2007년 입사자 중 연봉 순위 5위 까지 추출
+SELECT rownum, first_name, salary
+FROM (SELECT * FROM employees WHERE hire_date LIKE '07%'
+ORDER BY salary DESC) 
+WHERE rownum <=5;
+
+-------
+--집합연산 
+SELECT first_name, salary, hire_date FROM employees
+WHERE hire_date < '05/01/01'--2005년 1월 1일 이전 입사자 (24)
+ORDER BY hire_date ASC;
+
+SELECT first_name, salary, hire_date FROM employees 
+WHERE salary > 12000; --12000 이상 초과 사원 
+
+--입사일이 2005년 1월 1일 이전이고, 급여가 12000이상인 사람
+SELECT first_name, salary, hire_date FROM employees 
+WHERE hire_date <'05/01/01' 
+INTERSECT 
+SELECT first_name, salary, hire_date FROM employees 
+WHERE salary > 12000 
+ORDER BY hire_date;--(6)
+
+SELECT first_name, salary, hire_date FROM employees 
+WHERE hire_date <'05/01/01' 
+UNION 
+SELECT first_name, salary, hire_date FROM employees 
+WHERE salary > 12000 
+ORDER BY hire_date;--(26)
+
+SELECT first_name, salary, hire_date FROM employees 
+WHERE hire_date <'05/01/01' 
+UNION ALL 
+SELECT first_name, salary, hire_date FROM employees 
+WHERE salary > 12000 
+ORDER BY hire_date; --(32)
+
+SELECT first_name, salary, hire_date FROM employees 
+WHERE hire_date <'05/01/01' 
+MINUS 
+SELECT first_name, salary, hire_date FROM employees 
+WHERE salary > 12000 
+ORDER BY salary DESC; --(18)
+
+
+--RANK 관련 함수 랭킹 
+SELECT first_name, salary,
+RANK( ) OVER (ORDER BY salary DESC) as "RANK",
+DENSE_RANK ( ) OVER (ORDER BY salary DESC) as "DENSE RANK",
+ROW_NUMBER( ) OVER (ORDER BY salary DESC) as "ROW NUMBER"
+FROM employees;
+
+
+--계층형 쿼리 (Oracle)
+--질의 결과를 tree형태의 구조로 출력함 
+--현재 employees 테이블을 이용, 조직도를 뽑아보자
+SELECT employee_id, first_name, manager_id
+FROM employees;
+
+SELECT level, employee_id, first_name, manager_id
+FROM employees
+START WITH manager_id IS NULL --ROOT 노드의 조건
+CONNECT BY PRIOR employee_id=manager_id
+ORDER BY level;
+
+--JOIN를 이용하여 manage_name 까지 확인 
+SELECT level, e.employee_id, e.first_name || ' ' || e.last_name, 
+e.manager_id, m.employee_id, m.first_name || ' '|| m.last_name
+FROM employees e LEFT OUTER JOIN employees m 
+ON e.manager_id =m.employee_id
+START WITH e.manager_id IS NULL
+CONNECT BY PRIOR e.employee_id= m.manager_id
+ORDER BY level;
