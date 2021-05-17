@@ -6,6 +6,7 @@
 
 --사용자 생성
 CREATE USER C##KSE IDENTIFIED BY 1234;
+
 --사용자 비밀번호 변경 
 ALTER USER C##KSE IDENTIFIED BY test;
 --사용자의 삭제
