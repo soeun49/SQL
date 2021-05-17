@@ -395,3 +395,5 @@ ON e.manager_id =m.employee_id
 START WITH e.manager_id IS NULL
 CONNECT BY PRIOR e.employee_id= m.manager_id
 ORDER BY level;
+
+
