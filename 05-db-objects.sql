@@ -195,3 +195,11 @@ MINVALUE 1
 MAXVALUE 1000;
 
 SELECT*FROM USER_SEQUENCES;
+
+-- TEST INSERT
+INSERT INTO author(author_id, author_name) VALUES (seq_author_id.NEXTVAL, '홍길동');
+INSERT INTO author(author_id, author_name) VALUES (seq_author_id.NEXTVAL, '고길동');
+
+commit;
+
+SELECT *FROM author;
