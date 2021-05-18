@@ -13,6 +13,7 @@ CREATE TABLE emp123
     AS SELECT*FROM hr.employees 
     WHERE department_id IN (10,20,30);
 
+
 SELECT *FROM emp123;
 
 --emp123 테이블을 기반으로 department_id가 30번인 사람들만 보여주는 view를 생성
@@ -186,6 +187,7 @@ SELECT* FROM USER_OBJECTS WHERE object_type= 'SEQUENCE';
 -- book_id를 위한 시퀀스도 추가해보자
 SELECT MAX(book_id) FROM book;
 
+-- 시퀀스 생성
 CREATE SEQUENCE seq_book_id 
 START WITH 3
 INCREMENT BY 1
